@@ -1,4 +1,3 @@
-
 // DSoundDlg.cpp: Implementierungsdatei
 // 
 
@@ -14,7 +13,6 @@
 
 
 // CDSoundDlg-Dialogfeld
-
 
 
 CDSoundDlg::CDSoundDlg(CWnd* pParent /*=nullptr*/)
@@ -61,7 +59,6 @@ BOOL CDSoundDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Großes Symbol verwenden
 	SetIcon(m_hIcon, FALSE);		// Kleines Symbol verwenden
 
-	// TODO: Hier zusätzliche Initialisierung einfügen
 	if (!m_ds.Create(this)) 
 		OnCancel();
  
@@ -252,7 +249,7 @@ void CDSoundDlg::OnNMCustomdrawBalance(NMHDR* pNMHDR, LRESULT* pResult)
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	*pResult = 0;
 
-	// Hole die aktuelle Position des Balance-Schiebereglers (Wertbereich: 0 bis 100)
+	// Hole die aktuelle Position des Balance-Schiebereglers
 	CSliderCtrl* pBalanceSlider = (CSliderCtrl*)GetDlgItem(IDC_Balance);
 	int balanceValue = pBalanceSlider->GetPos();
 
@@ -329,7 +326,7 @@ void CDSoundDlg::OnTimer(UINT_PTR nIDEvent)
 		KillTimer(1); return; 
 	} 
 	if (((playpos > 50) && (buffnr==0)) || ((playpos < 50) && (buffnr==1))) { 
-		if ((++j)==9) { // major scale finished 
+		if ((++j)==9) {
 			KillTimer(1); 
 			j=0; 
 			if (!m_ds.Stop(lpDSBSecondaryTonleiter)) 
@@ -337,7 +334,7 @@ void CDSoundDlg::OnTimer(UINT_PTR nIDEvent)
 			return; 
 		} 
 		m_ds.GenerateSound(lpDSBSecondaryTonleiter,buffnr*2,2, ton[j]); 
-		if (buffnr==1) buffnr=0; // change buffer 
+		if (buffnr==1) buffnr=0;
 		else buffnr=1; 
 	} 
 

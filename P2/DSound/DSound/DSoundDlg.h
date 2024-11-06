@@ -1,4 +1,3 @@
-
 // DSoundDlg.h: Headerdatei
 //
 
