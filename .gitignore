@@ -368,3 +368,6 @@ FodyWeavers.xsd
 *.mpg
 *.mid
 *.mp3
+*.pcm
+*.raw
+*.wav
