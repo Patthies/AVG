@@ -247,23 +247,80 @@ void CDSoundDlg::OnBnClickedC2klavier()
 		OnCancel();
 }
 
-void CDSoundDlg::OnNMCustomdrawBalance(NMHDR* pNMHDR, LRESULT* pResult)  // TODO: zum funktionieren bringen
+void CDSoundDlg::OnNMCustomdrawBalance(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	*pResult = 0;
 
-	if (!m_ds.SetBalance(lpDSBSecondary, 0)) 
+	// Hole die aktuelle Position des Balance-Schiebereglers (Wertbereich: 0 bis 100)
+	CSliderCtrl* pBalanceSlider = (CSliderCtrl*)GetDlgItem(IDC_Balance);
+	int balanceValue = pBalanceSlider->GetPos();
+
+	// Konvertiere in Dezibelbereich von -10.000 (voll links) bis +10.000 (voll rechts)
+	LONG balanceDb = (balanceValue - 50) * 200;
+
+	// Setze Balance
+	if (!m_ds.SetBalance(lpDSBSecondary, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryTonleiter, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryDreiklang, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryC, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryD, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryE, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryF, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryG, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryA, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryH, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryC2, balanceDb))
 		OnCancel();
 }
 
-void CDSoundDlg::OnNMCustomdrawLautstaerke(NMHDR* pNMHDR, LRESULT* pResult) // TODO: zum funktionieren bringen
+void CDSoundDlg::OnNMCustomdrawLautstaerke(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	*pResult = 0;
 
-	if (!m_ds.SetPlaybackVolume(lpDSBSecondary, -920)) 
+	// Hole die aktuelle Position des Lautstärke-Schiebereglers
+	CSliderCtrl* pVolumeSlider = (CSliderCtrl*)GetDlgItem(IDC_Lautstaerke);
+	int volumeValue = pVolumeSlider->GetPos();
+
+	// Konvertiere in Dezibelbereich von 0 (laut) bis -1000 (stumm)
+	LONG volumeDb = -volumeValue * 10;
+
+	// Setze Lautstärke
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondary, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryTonleiter, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryDreiklang, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryC, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryD, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryE, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryF, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryG, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryA, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryH, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryC2, volumeDb))
 		OnCancel();
 }
+
 
 void CDSoundDlg::OnTimer(UINT_PTR nIDEvent)
 {
