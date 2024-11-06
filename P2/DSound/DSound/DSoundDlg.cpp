@@ -1,6 +1,6 @@
 
 // DSoundDlg.cpp: Implementierungsdatei
-//
+// 
 
 #include "pch.h"
 #include "framework.h"
