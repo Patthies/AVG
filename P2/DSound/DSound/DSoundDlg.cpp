@@ -118,6 +118,28 @@ BOOL CDSoundDlg::OnInitDialog()
 	ton[8]= 0;
 	m_ds.GenerateSound(lpDSBSecondaryTonleiter, 0, 2, d);
 
+	// Hole den Balance-Slider und setze ihn auf die Mittelposition (50)
+	CSliderCtrl* pBalanceSlider = (CSliderCtrl*)GetDlgItem(IDC_Balance);
+	pBalanceSlider->SetRange(0, 100);  // Slider-Bereich
+	pBalanceSlider->SetPos(50);        // Mittelposition als Standard
+
+	// Setze den Anfangswert für die Balance auf 0 Dezibel (zentriert)
+	int balanceValue = 50;               // Mittelwert des Sliders
+	LONG balanceDb = (balanceValue - 50) * 200;
+
+	// Balance-Wert auf alle Soundbuffer anwenden
+	m_ds.SetBalance(lpDSBSecondary, balanceDb);
+	m_ds.SetBalance(lpDSBSecondaryTonleiter, balanceDb);
+	m_ds.SetBalance(lpDSBSecondaryDreiklang, balanceDb);
+	m_ds.SetBalance(lpDSBSecondaryC, balanceDb);
+	m_ds.SetBalance(lpDSBSecondaryD, balanceDb);
+	m_ds.SetBalance(lpDSBSecondaryE, balanceDb);
+	m_ds.SetBalance(lpDSBSecondaryF, balanceDb);
+	m_ds.SetBalance(lpDSBSecondaryG, balanceDb);
+	m_ds.SetBalance(lpDSBSecondaryA, balanceDb);
+	m_ds.SetBalance(lpDSBSecondaryH, balanceDb);
+	m_ds.SetBalance(lpDSBSecondaryC2, balanceDb);
+
 	return TRUE;  // TRUE zurückgeben, wenn der Fokus nicht auf ein Steuerelement gesetzt wird
 }
 
@@ -317,7 +339,6 @@ void CDSoundDlg::OnNMCustomdrawLautstaerke(NMHDR* pNMHDR, LRESULT* pResult)
 	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryC2, volumeDb))
 		OnCancel();
 }
-
 
 void CDSoundDlg::OnTimer(UINT_PTR nIDEvent)
 {
