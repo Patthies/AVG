@@ -36,8 +36,12 @@ protected:
 		lpDSBSecondaryG, 
 		lpDSBSecondaryA, 
 		lpDSBSecondaryH, 
-		lpDSBSecondaryC2;
+		lpDSBSecondaryC2,
+		lpDSBSecondaryPCM;
 	double ton[9];
+	CFile m_pcmFile;
+	ULONGLONG m_filePosition;
+	bool m_isPlaying;
 
 	// Generierte Funktionen für die Meldungstabellen
 	virtual BOOL OnInitDialog();

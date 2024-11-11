@@ -109,7 +109,9 @@ bool CDirectSound::Play(LPDIRECTSOUNDBUFFER buf, bool looped) {
 	if (!buf) return false; 
 	if (buf->Play(0, 0, looped ? DSBPLAY_LOOPING : 0) != DS_OK) { 
 		AfxMessageBox(L"Cannot play the secondary buffer"); 
-		return false; } return true; 
+		return false; 
+	} 
+	return true; 
 }
 
 bool CDirectSound::Stop(LPDIRECTSOUNDBUFFER buf) { 
@@ -180,4 +182,59 @@ int CDirectSound::GetPlayPosition(LPDIRECTSOUNDBUFFER buf) {
 		return-1; 
 	} 
 	return ((playPos * 100) / caps.dwBufferBytes); 
+}
+
+bool CDirectSound::PlayPCMFile(LPDIRECTSOUNDBUFFER buf, const CString& filename, DWORD& bytesRead) {
+	CFile file;
+	if (!file.Open(filename, CFile::modeRead | CFile::typeBinary)) {
+		AfxMessageBox(L"Cannot open PCM file");
+		return false;
+	}
+
+	// Ersten Buffer füllen
+	bytesRead = FillBufferWithPCMData(buf, file, 0, 2);
+	file.Close();
+
+	if (bytesRead > 0) {
+		// Starten der Wiedergabe
+		return Play(buf, false);
+	}
+	return false;
+}
+
+DWORD CDirectSound::FillBufferWithPCMData(LPDIRECTSOUNDBUFFER buf, CFile& file, DWORD offset, DWORD size) {
+	WAVEFORMATEX pcmwf;
+	if (!GetWaveFormat(buf, &pcmwf)) return 0;
+
+	void* lpvPtr1, * lpvPtr2;
+	DWORD dwBytes1, dwBytes2;
+
+	if (!LockBuffer(buf, offset, size,
+		&lpvPtr1, &dwBytes1,
+		&lpvPtr2, &dwBytes2)) {
+		return 0;
+	}
+
+	DWORD totalBytesRead = 0;
+
+	// Ersten Puffer füllen
+	UINT bytesRead = file.Read(lpvPtr1, dwBytes1);
+	totalBytesRead += bytesRead;
+	if (bytesRead < dwBytes1) {
+		// Rest mit Nullen füllen
+		memset((BYTE*)lpvPtr1 + bytesRead, 0, dwBytes1 - bytesRead);
+	}
+
+	// Zweiten Puffer füllen falls vorhanden
+	if (lpvPtr2 && dwBytes2 > 0) {
+		bytesRead = file.Read(lpvPtr2, dwBytes2);
+		totalBytesRead += bytesRead;
+		if (bytesRead < dwBytes2) {
+			// Rest mit Nullen füllen
+			memset((BYTE*)lpvPtr2 + bytesRead, 0, dwBytes2 - bytesRead);
+		}
+	}
+
+	UnlockBuffer(buf, lpvPtr1, dwBytes1, lpvPtr2, dwBytes2);
+	return totalBytesRead;
 }

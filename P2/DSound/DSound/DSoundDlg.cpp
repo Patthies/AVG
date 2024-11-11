@@ -85,6 +85,11 @@ BOOL CDSoundDlg::OnInitDialog()
 		OnCancel();
 	if ((lpDSBSecondaryC2 = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
 		OnCancel();
+	if ((lpDSBSecondaryPCM = m_ds.CreateSoundBuffer(2, 16, 22050, 4)) == 0)
+		OnCancel();
+
+	m_filePosition = 0;
+	m_isPlaying = false;
 
 	// den Ton c für 2 Sekunden generieren, zyklisch
 	m_ds.GenerateSound(lpDSBSecondary,0,2,264);
@@ -192,6 +197,13 @@ void CDSoundDlg::OnBnClickedStop()
 	m_ds.Stop(lpDSBSecondaryA);
 	m_ds.Stop(lpDSBSecondaryH);
 	m_ds.Stop(lpDSBSecondaryC2);
+
+	if (m_isPlaying) {
+		KillTimer(2);
+		m_ds.Stop(lpDSBSecondaryPCM);
+		m_isPlaying = false;
+		m_filePosition = 0;
+	}
 }
 
 void CDSoundDlg::OnBnClicked264hz()
@@ -209,7 +221,13 @@ void CDSoundDlg::OnBnClickedCtonleiter()
 
 void CDSoundDlg::OnBnClickedPcmsound()
 {
-	// TODO: Fügen Sie hier Ihren Handlercode für Benachrichtigungen des Steuerelements ein.
+	// PCM-Datei abspielen
+	DWORD bytesRead = 0;
+	if (m_ds.PlayPCMFile(lpDSBSecondaryPCM, L"sound.pcm", bytesRead)) {
+		m_filePosition = bytesRead;
+		m_isPlaying = true;
+		SetTimer(2, 50, NULL);  // Timer für Buffer-Updates
+	}
 }
 
 void CDSoundDlg::OnBnClickedCdreiklang()
@@ -301,6 +319,8 @@ void CDSoundDlg::OnNMCustomdrawBalance(NMHDR* pNMHDR, LRESULT* pResult)
 		OnCancel();
 	if (!m_ds.SetBalance(lpDSBSecondaryC2, balanceDb))
 		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryPCM, balanceDb))
+		OnCancel();
 }
 
 void CDSoundDlg::OnNMCustomdrawLautstaerke(NMHDR* pNMHDR, LRESULT* pResult)
@@ -338,26 +358,74 @@ void CDSoundDlg::OnNMCustomdrawLautstaerke(NMHDR* pNMHDR, LRESULT* pResult)
 		OnCancel();
 	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryC2, volumeDb))
 		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryPCM, volumeDb))
+		OnCancel();
 }
 
 void CDSoundDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	static int j=0, buffnr=1, playpos; 
-	if ((playpos=m_ds.GetPlayPosition(lpDSBSecondaryTonleiter))==-1) { 
-		KillTimer(1); return; 
-	} 
-	if (((playpos > 50) && (buffnr==0)) || ((playpos < 50) && (buffnr==1))) { 
-		if ((++j)==9) {
-			KillTimer(1); 
-			j=0; 
-			if (!m_ds.Stop(lpDSBSecondaryTonleiter)) 
-				return; 
-			return; 
-		} 
-		m_ds.GenerateSound(lpDSBSecondaryTonleiter,buffnr*2,2, ton[j]); 
-		if (buffnr==1) buffnr=0;
-		else buffnr=1; 
-	} 
+	// Timer für C-Dur Tonleiter
+	if (nIDEvent == 1) {
+		static int j = 0, buffnr = 1, playpos;
+		if ((playpos = m_ds.GetPlayPosition(lpDSBSecondaryTonleiter)) == -1) {
+			KillTimer(1);
+			return;
+		}
+		if (((playpos > 50) && (buffnr == 0)) || ((playpos < 50) && (buffnr == 1))) {
+			if ((++j) == 9) {
+				KillTimer(1);
+				j = 0;
+				if (!m_ds.Stop(lpDSBSecondaryTonleiter))
+					return;
+				return;
+			}
+			m_ds.GenerateSound(lpDSBSecondaryTonleiter, buffnr * 2, 2, ton[j]);
+			if (buffnr == 1) buffnr = 0;
+			else buffnr = 1;
+		}
+	}
+	// Timer für PCM-Wiedergabe
+	else if (nIDEvent == 2 && m_isPlaying) {
+		static int buffnr = 0;
+
+		int playpos = m_ds.GetPlayPosition(lpDSBSecondaryPCM);
+		if (playpos == -1) {
+			KillTimer(2);
+			m_ds.Stop(lpDSBSecondaryPCM);
+			m_isPlaying = false;
+			m_filePosition = 0;
+			return;
+		}
+
+		// Wenn Wiedergabe im anderen Puffer, aktuellen Puffer neu füllen
+		if ((playpos < 50 && buffnr == 1) || (playpos >= 50 && buffnr == 0)) {
+			if (m_pcmFile.Open(L"sound.pcm", CFile::modeRead | CFile::typeBinary)) {
+				m_pcmFile.Seek(m_filePosition, CFile::begin);
+
+				DWORD bytesRead = m_ds.FillBufferWithPCMData(
+					lpDSBSecondaryPCM,
+					m_pcmFile,        // Die Datei
+					buffnr * 2,       // Offset in Sekunden
+					2                 // Größe in Sekunden
+				);
+
+				m_filePosition += bytesRead;
+
+				// Wenn Dateiende erreicht
+				if (bytesRead == 0 || m_filePosition >= m_pcmFile.GetLength()) {
+					KillTimer(2);
+					m_ds.Stop(lpDSBSecondaryPCM);
+					m_isPlaying = false;
+					m_filePosition = 0;
+					m_pcmFile.Close();
+					return;
+				}
+
+				m_pcmFile.Close();
+				buffnr = (buffnr == 0) ? 1 : 0;
+			}
+		}
+	}
 
 	CDialogEx::OnTimer(nIDEvent);
 }
