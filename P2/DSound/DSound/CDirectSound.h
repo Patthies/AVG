@@ -15,8 +15,7 @@ public:
 	bool SetBalance(LPDIRECTSOUNDBUFFER buf, LONG db); 
 	int	GetPlayPosition(LPDIRECTSOUNDBUFFER buf); 
 	bool GenerateSound(LPDIRECTSOUNDBUFFER buf, DWORD offset, DWORD length, int f); 
-	bool PlayPCMFile(LPDIRECTSOUNDBUFFER buf, const CString& filename, DWORD& bytesRead);
-	DWORD FillBufferWithPCMData(LPDIRECTSOUNDBUFFER buf, CFile& file, DWORD offset, DWORD size);
+	bool CDirectSound::GeneratePCMSound(LPDIRECTSOUNDBUFFER buf, DWORD offset, DWORD length, char* pszFileName, int section);
 
 private: 
 	DSBUFFERDESC  dsbd;					// buffer description

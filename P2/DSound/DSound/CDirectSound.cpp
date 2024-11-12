@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "CDirectSound.h"
 
+#pragma warning (disable: 4996)
+
 CDirectSound::CDirectSound() {
 	CoInitialize(NULL); // init COM-Interface   
 	lpds = 0; lpDSBPrimary = 0; 
@@ -149,6 +151,61 @@ bool CDirectSound::GenerateSound(LPDIRECTSOUNDBUFFER buf, DWORD offset, DWORD le
 	return true; 
 }
 
+bool CDirectSound::GeneratePCMSound(LPDIRECTSOUNDBUFFER buf, DWORD offset, DWORD length, char* pszFileName, int section)
+{
+	WAVEFORMATEX pcmwf;
+	if (!buf) return false;
+
+	// Hole das Wellenformat für den Buffer
+	if (!GetWaveFormat(buf, &pcmwf))
+		return false;
+
+	// Öffne die PCM-Datei im Binärmodus
+	FILE* pcmFile = fopen(pszFileName, "rb");
+	if (!pcmFile)
+		return false;
+
+	// Berechne die Position innerhalb der Datei für das gewünschte Segment
+	DWORD bytesPerSecond = pcmwf.nAvgBytesPerSec;
+	DWORD startPosition = section * 2 * bytesPerSecond;
+	fseek(pcmFile, startPosition, SEEK_SET); // Setze die Leseposition
+
+	// Berechne die Anzahl der zu lesenden Bytes für `durationSec`
+	DWORD bytesToRead = bytesPerSecond * 2;
+
+	// Sperre den Buffer und hole die Pufferzeiger
+	void* lpvPtr1, * lpvPtr2; DWORD dwBytes1, dwBytes2;
+	if (!this->LockBuffer(buf, offset, length,
+		&lpvPtr1, &dwBytes1, // get pointer 1
+		&lpvPtr2, &dwBytes2)) // get pointer 2 (the buffer is circular)
+		return false;
+
+	// Lese PCM-Daten und schreibe sie in den Buffer
+	size_t bytesRead = fread(lpvPtr1, 1, dwBytes1, pcmFile);
+	if (bytesRead < dwBytes1) {
+		// Falls weniger Daten gelesen wurden, den Rest des Buffers mit Nullen füllen
+		memset((char*)lpvPtr1 + bytesRead, 0, dwBytes1 - bytesRead);
+	}
+
+	// Wenn ein zweiter Teil des Buffers existiert, lese dort weiter
+	if (dwBytes2 > 0) {
+		bytesRead = fread(lpvPtr2, 1, dwBytes2, pcmFile);
+		if (bytesRead < dwBytes2) {
+			// Fülle den Rest des Buffers mit Nullen, falls weniger Daten gelesen wurden
+			memset((char*)lpvPtr2 + bytesRead, 0, dwBytes2 - bytesRead);
+		}
+	}
+
+	fclose(pcmFile);  // Schließe die Datei
+
+	// unlock memory
+	if (!this->UnlockBuffer(buf,
+		lpvPtr1, dwBytes1, // pointer 1
+		lpvPtr2, dwBytes2)) // pointer 2
+		return false;
+	return true;
+}
+
 bool CDirectSound::SetPlaybackVolume(LPDIRECTSOUNDBUFFER buf, LONG db) { 
 	if (!buf) return false; 
 	if (buf->SetVolume(db) != DS_OK) { 
@@ -182,59 +239,4 @@ int CDirectSound::GetPlayPosition(LPDIRECTSOUNDBUFFER buf) {
 		return-1; 
 	} 
 	return ((playPos * 100) / caps.dwBufferBytes); 
-}
-
-bool CDirectSound::PlayPCMFile(LPDIRECTSOUNDBUFFER buf, const CString& filename, DWORD& bytesRead) {
-	CFile file;
-	if (!file.Open(filename, CFile::modeRead | CFile::typeBinary)) {
-		AfxMessageBox(L"Cannot open PCM file");
-		return false;
-	}
-
-	// Ersten Buffer füllen
-	bytesRead = FillBufferWithPCMData(buf, file, 0, 2);
-	file.Close();
-
-	if (bytesRead > 0) {
-		// Starten der Wiedergabe
-		return Play(buf, false);
-	}
-	return false;
-}
-
-DWORD CDirectSound::FillBufferWithPCMData(LPDIRECTSOUNDBUFFER buf, CFile& file, DWORD offset, DWORD size) {
-	WAVEFORMATEX pcmwf;
-	if (!GetWaveFormat(buf, &pcmwf)) return 0;
-
-	void* lpvPtr1, * lpvPtr2;
-	DWORD dwBytes1, dwBytes2;
-
-	if (!LockBuffer(buf, offset, size,
-		&lpvPtr1, &dwBytes1,
-		&lpvPtr2, &dwBytes2)) {
-		return 0;
-	}
-
-	DWORD totalBytesRead = 0;
-
-	// Ersten Puffer füllen
-	UINT bytesRead = file.Read(lpvPtr1, dwBytes1);
-	totalBytesRead += bytesRead;
-	if (bytesRead < dwBytes1) {
-		// Rest mit Nullen füllen
-		memset((BYTE*)lpvPtr1 + bytesRead, 0, dwBytes1 - bytesRead);
-	}
-
-	// Zweiten Puffer füllen falls vorhanden
-	if (lpvPtr2 && dwBytes2 > 0) {
-		bytesRead = file.Read(lpvPtr2, dwBytes2);
-		totalBytesRead += bytesRead;
-		if (bytesRead < dwBytes2) {
-			// Rest mit Nullen füllen
-			memset((BYTE*)lpvPtr2 + bytesRead, 0, dwBytes2 - bytesRead);
-		}
-	}
-
-	UnlockBuffer(buf, lpvPtr1, dwBytes1, lpvPtr2, dwBytes2);
-	return totalBytesRead;
 }

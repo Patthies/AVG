@@ -62,10 +62,10 @@ BOOL CDSoundDlg::OnInitDialog()
 	if (!m_ds.Create(this)) 
 		OnCancel();
  
-	// create a 4 second sound buffer 
+	// create a sound buffer 
 	if ((lpDSBSecondary = m_ds.CreateSoundBuffer(2, 16, 22050, 4)) == 0)
 		OnCancel();
-	if ((lpDSBSecondaryDreiklang = m_ds.CreateSoundBuffer(2, 16, 22050, 3)) == 0)
+	if ((lpDSBSecondaryDreiklang = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
 		OnCancel();
 	if ((lpDSBSecondaryTonleiter = m_ds.CreateSoundBuffer(2, 16, 22050, 4)) == 0)
 		OnCancel();
@@ -105,23 +105,18 @@ BOOL CDSoundDlg::OnInitDialog()
 	m_ds.GenerateSound(lpDSBSecondaryH, 0, 2, d * 15 / 8.);
 	m_ds.GenerateSound(lpDSBSecondaryC2, 0, 2, d * 2);
 
-	// C-Dur Dreiklang 
-	// TODO: rausfinden ob hier gemeint ist dass die Töne gleichzeitig abgespielt werden oder ob es so richtig ist wie ich es gemacht habe
-	m_ds.GenerateSound(lpDSBSecondaryDreiklang, 0, 1, 264);
-	m_ds.GenerateSound(lpDSBSecondaryDreiklang, 1, 1, 330);
-	m_ds.GenerateSound(lpDSBSecondaryDreiklang, 2, 1, 396);
-
 	// C-Dur Tonleiter Doppelpuffertechnik
-	ton[0]= d; 
-	ton[1]= d*9/8.; 
-	ton[2]= d*5/4.; 
-	ton[3]= d*4/3.; 
-	ton[4]= d*3/2.; 
-	ton[5]= d*5/3.; 
-	ton[6]= d*15/8.; 
-	ton[7]= d*2; 
+	int x = 264; //Hz
+	ton[0]= x; 
+	ton[1]= x * 9 / 8.; 
+	ton[2]= x * 5 / 4.; 
+	ton[3]= x * 4 / 3.; 
+	ton[4]= x * 3 / 2.; 
+	ton[5]= x * 5 / 3.; 
+	ton[6]= x * 15 / 8.; 
+	ton[7]= x * 2; 
 	ton[8]= 0;
-	m_ds.GenerateSound(lpDSBSecondaryTonleiter, 0, 2, d);
+	m_ds.GenerateSound(lpDSBSecondaryTonleiter, 0, 2, x);
 
 	// Hole den Balance-Slider und setze ihn auf die Mittelposition (50)
 	CSliderCtrl* pBalanceSlider = (CSliderCtrl*)GetDlgItem(IDC_Balance);
@@ -129,7 +124,7 @@ BOOL CDSoundDlg::OnInitDialog()
 	pBalanceSlider->SetPos(50);        // Mittelposition als Standard
 
 	// Setze den Anfangswert für die Balance auf 0 Dezibel (zentriert)
-	int balanceValue = 50;               // Mittelwert des Sliders
+	int balanceValue = 50;             // Mittelwert des Sliders
 	LONG balanceDb = (balanceValue - 50) * 200;
 
 	// Balance-Wert auf alle Soundbuffer anwenden
@@ -144,13 +139,11 @@ BOOL CDSoundDlg::OnInitDialog()
 	m_ds.SetBalance(lpDSBSecondaryA, balanceDb);
 	m_ds.SetBalance(lpDSBSecondaryH, balanceDb);
 	m_ds.SetBalance(lpDSBSecondaryC2, balanceDb);
+	m_ds.SetBalance(lpDSBSecondaryPCM, balanceDb);
 
 	return TRUE;  // TRUE zurückgeben, wenn der Fokus nicht auf ein Steuerelement gesetzt wird
 }
 
-// Wenn Sie dem Dialogfeld eine Schaltfläche "Minimieren" hinzufügen, benötigen Sie
-//  den nachstehenden Code, um das Symbol zu zeichnen.  Für MFC-Anwendungen, die das 
-//  Dokument/Ansicht-Modell verwenden, wird dies automatisch ausgeführt.
 
 void CDSoundDlg::OnPaint()
 {
@@ -197,13 +190,7 @@ void CDSoundDlg::OnBnClickedStop()
 	m_ds.Stop(lpDSBSecondaryA);
 	m_ds.Stop(lpDSBSecondaryH);
 	m_ds.Stop(lpDSBSecondaryC2);
-
-	if (m_isPlaying) {
-		KillTimer(2);
-		m_ds.Stop(lpDSBSecondaryPCM);
-		m_isPlaying = false;
-		m_filePosition = 0;
-	}
+	m_ds.Stop(lpDSBSecondaryPCM);
 }
 
 void CDSoundDlg::OnBnClicked264hz()
@@ -221,18 +208,20 @@ void CDSoundDlg::OnBnClickedCtonleiter()
 
 void CDSoundDlg::OnBnClickedPcmsound()
 {
-	// PCM-Datei abspielen
-	DWORD bytesRead = 0;
-	if (m_ds.PlayPCMFile(lpDSBSecondaryPCM, L"sound.pcm", bytesRead)) {
-		m_filePosition = bytesRead;
-		m_isPlaying = true;
-		SetTimer(2, 50, NULL);  // Timer für Buffer-Updates
-	}
+	if (!m_ds.Play(lpDSBSecondaryPCM, true))
+		OnCancel();
+	m_ds.GeneratePCMSound(lpDSBSecondaryPCM, 0, 2, "sound.pcm", 0);
+
+	SetTimer(2, 700, NULL);
 }
 
 void CDSoundDlg::OnBnClickedCdreiklang()
 {
-	if (!m_ds.Play(lpDSBSecondaryDreiklang, true))
+	if (!m_ds.Play(lpDSBSecondaryC, false))
+		OnCancel();
+	if (!m_ds.Play(lpDSBSecondaryE, false))
+		OnCancel();
+	if (!m_ds.Play(lpDSBSecondaryG, false))
 		OnCancel();
 }
 
@@ -364,6 +353,8 @@ void CDSoundDlg::OnNMCustomdrawLautstaerke(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CDSoundDlg::OnTimer(UINT_PTR nIDEvent)
 {
+	static int j = 0, buffnr = 1, playpos;
+
 	// Timer für C-Dur Tonleiter
 	if (nIDEvent == 1) {
 		static int j = 0, buffnr = 1, playpos;
@@ -384,46 +375,21 @@ void CDSoundDlg::OnTimer(UINT_PTR nIDEvent)
 			else buffnr = 1;
 		}
 	}
-	// Timer für PCM-Wiedergabe
-	else if (nIDEvent == 2 && m_isPlaying) {
-		static int buffnr = 0;
-
-		int playpos = m_ds.GetPlayPosition(lpDSBSecondaryPCM);
-		if (playpos == -1) {
-			KillTimer(2);
-			m_ds.Stop(lpDSBSecondaryPCM);
-			m_isPlaying = false;
-			m_filePosition = 0;
-			return;
+	if (nIDEvent == 2) {
+		if ((playpos = m_ds.GetPlayPosition(lpDSBSecondaryPCM)) == -1) {
+			KillTimer(1); return;
 		}
-
-		// Wenn Wiedergabe im anderen Puffer, aktuellen Puffer neu füllen
-		if ((playpos < 50 && buffnr == 1) || (playpos >= 50 && buffnr == 0)) {
-			if (m_pcmFile.Open(L"sound.pcm", CFile::modeRead | CFile::typeBinary)) {
-				m_pcmFile.Seek(m_filePosition, CFile::begin);
-
-				DWORD bytesRead = m_ds.FillBufferWithPCMData(
-					lpDSBSecondaryPCM,
-					m_pcmFile,        // Die Datei
-					buffnr * 2,       // Offset in Sekunden
-					2                 // Größe in Sekunden
-				);
-
-				m_filePosition += bytesRead;
-
-				// Wenn Dateiende erreicht
-				if (bytesRead == 0 || m_filePosition >= m_pcmFile.GetLength()) {
-					KillTimer(2);
-					m_ds.Stop(lpDSBSecondaryPCM);
-					m_isPlaying = false;
-					m_filePosition = 0;
-					m_pcmFile.Close();
+		if (((playpos > 50) && (buffnr == 0)) || ((playpos < 50) && (buffnr == 1))) {
+			if ((++j) == 9) { // major scale finished
+				KillTimer(1);
+				j = 0;
+				if (!m_ds.Stop(lpDSBSecondaryPCM))
 					return;
-				}
-
-				m_pcmFile.Close();
-				buffnr = (buffnr == 0) ? 1 : 0;
+				return;
 			}
+			m_ds.GeneratePCMSound(lpDSBSecondaryPCM, buffnr * 2, 2, "sound.pcm", j);
+			if (buffnr == 1) buffnr = 0; // change buffer
+			else buffnr = 1;
 		}
 	}
 
