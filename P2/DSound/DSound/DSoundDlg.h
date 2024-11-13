@@ -47,7 +47,8 @@ protected:
 		lpDSBSecondaryHGuitar,
 		lpDSBSecondaryC2Guitar,
 		lpDSBSecondaryPCM;
-	double ton[9];
+
+	int ton[9];
 	bool isGuitarSound;
 
 	// Generierte Funktionen für die Meldungstabellen
