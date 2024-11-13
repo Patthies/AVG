@@ -26,7 +26,7 @@ protected:
 
 	CDirectSound m_ds;
 	LPDIRECTSOUNDBUFFER 
-		lpDSBSecondary, 
+		lpDSBSecondary , 
 		lpDSBSecondaryTonleiter, 
 		lpDSBSecondaryC, 
 		lpDSBSecondaryD, 

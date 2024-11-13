@@ -126,12 +126,12 @@ BOOL CDSoundDlg::OnInitDialog()
 	// C-Dur Tonleiter einzelne Töne
 	int d = 264; //Hz
 	m_ds.GenerateSound(lpDSBSecondaryC, 0, 2, d);
-	m_ds.GenerateSound(lpDSBSecondaryD, 0, 2, d * 9 / 8.);
-	m_ds.GenerateSound(lpDSBSecondaryE, 0, 2, d * 5 / 4.);
-	m_ds.GenerateSound(lpDSBSecondaryF, 0, 2, d * 4 / 3.);
-	m_ds.GenerateSound(lpDSBSecondaryG, 0, 2, d * 3 / 2.);
-	m_ds.GenerateSound(lpDSBSecondaryA, 0, 2, d * 5 / 3.);
-	m_ds.GenerateSound(lpDSBSecondaryH, 0, 2, d * 15 / 8.);
+	m_ds.GenerateSound(lpDSBSecondaryD, 0, 2, d * 9 / 8);
+	m_ds.GenerateSound(lpDSBSecondaryE, 0, 2, d * 5 / 4);
+	m_ds.GenerateSound(lpDSBSecondaryF, 0, 2, d * 4 / 3);
+	m_ds.GenerateSound(lpDSBSecondaryG, 0, 2, d * 3 / 2);
+	m_ds.GenerateSound(lpDSBSecondaryA, 0, 2, d * 5 / 3);
+	m_ds.GenerateSound(lpDSBSecondaryH, 0, 2, d * 15 / 8);
 	m_ds.GenerateSound(lpDSBSecondaryC2, 0, 2, d * 2);
 
 	// C-Dur Guitar Tonleiter einzelne Töne
@@ -147,12 +147,12 @@ BOOL CDSoundDlg::OnInitDialog()
 	// C-Dur Tonleiter Doppelpuffertechnik
 	int x = 264; //Hz
 	ton[0]= x; 
-	ton[1]= x * 9 / 8.; 
-	ton[2]= x * 5 / 4.; 
-	ton[3]= x * 4 / 3.; 
-	ton[4]= x * 3 / 2.; 
-	ton[5]= x * 5 / 3.; 
-	ton[6]= x * 15 / 8.; 
+	ton[1]= x * 9 / 8; 
+	ton[2]= x * 5 / 4; 
+	ton[3]= x * 4 / 3; 
+	ton[4]= x * 3 / 2; 
+	ton[5]= x * 5 / 3; 
+	ton[6]= x * 15 / 8; 
 	ton[7]= x * 2; 
 	ton[8]= 0;
 	m_ds.GenerateSound(lpDSBSecondaryTonleiter, 0, 2, x);
