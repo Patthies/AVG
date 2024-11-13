@@ -2,6 +2,7 @@
 #include "CDirectSound.h"
 
 #pragma warning (disable: 4996)
+#pragma warning (disable: 26495)
 
 CDirectSound::CDirectSound() {
 	CoInitialize(NULL); // init COM-Interface   

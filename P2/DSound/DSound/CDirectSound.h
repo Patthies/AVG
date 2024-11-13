@@ -1,7 +1,8 @@
 #pragma once
 
 class CDirectSound {
-public: 
+public:
+ 
 	CDirectSound(); 
 	virtual ~CDirectSound(); 
 	bool Create(CWnd* wnd); 

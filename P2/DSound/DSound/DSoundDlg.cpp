@@ -11,6 +11,7 @@
 #define new DEBUG_NEW
 #endif
 
+#pragma warning (disable: 26495)
 
 // CDSoundDlg-Dialogfeld
 
@@ -121,7 +122,7 @@ BOOL CDSoundDlg::OnInitDialog()
 	m_ds.GenerateSound(lpDSBSecondary,0,2,264);
 
 	// den Ton c Guitar für 2 Sekunden generieren, zyklisch
-	if (!m_ds.GeneratePCMSound(lpDSBSecondaryGuitar, 0, 1, "C.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryGuitar, 0, 2, "C.raw", 0)) OnClose();
 
 	// C-Dur Tonleiter einzelne Töne
 	int d = 264; //Hz
@@ -135,14 +136,14 @@ BOOL CDSoundDlg::OnInitDialog()
 	m_ds.GenerateSound(lpDSBSecondaryC2, 0, 2, d * 2);
 
 	// C-Dur Guitar Tonleiter einzelne Töne
-	if (!m_ds.GeneratePCMSound(lpDSBSecondaryCGuitar, 0, 1, "C.raw", 0)) OnClose();
-	if (!m_ds.GeneratePCMSound(lpDSBSecondaryDGuitar, 0, 1, "D.raw", 0)) OnClose();
-	if (!m_ds.GeneratePCMSound(lpDSBSecondaryEGuitar, 0, 1, "E.raw", 0)) OnClose();
-	if (!m_ds.GeneratePCMSound(lpDSBSecondaryFGuitar, 0, 1, "F.raw", 0)) OnClose();
-	if (!m_ds.GeneratePCMSound(lpDSBSecondaryGGuitar, 0, 1, "G.raw", 0)) OnClose();
-	if (!m_ds.GeneratePCMSound(lpDSBSecondaryAGuitar, 0, 1, "A.raw", 0)) OnClose();
-	if (!m_ds.GeneratePCMSound(lpDSBSecondaryHGuitar, 0, 1, "H.raw", 0)) OnClose();
-	if (!m_ds.GeneratePCMSound(lpDSBSecondaryC2Guitar, 0, 1, "C_hoch.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryCGuitar, 0, 2, "C.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryDGuitar, 0, 2, "D.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryEGuitar, 0, 2, "E.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryFGuitar, 0, 2, "F.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryGGuitar, 0, 2, "G.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryAGuitar, 0, 2, "A.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryHGuitar, 0, 2, "H.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryC2Guitar, 0, 2, "C_hoch.raw", 0)) OnClose();
 
 	// C-Dur Tonleiter Doppelpuffertechnik
 	int x = 264; //Hz
