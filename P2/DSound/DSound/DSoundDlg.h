@@ -27,7 +27,6 @@ protected:
 	CDirectSound m_ds;
 	LPDIRECTSOUNDBUFFER 
 		lpDSBSecondary, 
-		lpDSBSecondaryDreiklang, 
 		lpDSBSecondaryTonleiter, 
 		lpDSBSecondaryC, 
 		lpDSBSecondaryD, 
@@ -37,11 +36,19 @@ protected:
 		lpDSBSecondaryA, 
 		lpDSBSecondaryH, 
 		lpDSBSecondaryC2,
+		lpDSBSecondaryGuitar,
+		lpDSBSecondaryTonleiterGuitar,
+		lpDSBSecondaryCGuitar,
+		lpDSBSecondaryDGuitar,
+		lpDSBSecondaryEGuitar,
+		lpDSBSecondaryFGuitar,
+		lpDSBSecondaryGGuitar,
+		lpDSBSecondaryAGuitar,
+		lpDSBSecondaryHGuitar,
+		lpDSBSecondaryC2Guitar,
 		lpDSBSecondaryPCM;
 	double ton[9];
-	CFile m_pcmFile;
-	ULONGLONG m_filePosition;
-	bool m_isPlaying;
+	bool isGuitarSound;
 
 	// Generierte Funktionen für die Meldungstabellen
 	virtual BOOL OnInitDialog();
@@ -65,4 +72,5 @@ public:
 	afx_msg void OnNMCustomdrawBalance(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnNMCustomdrawLautstaerke(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedCheckguitar();
 };

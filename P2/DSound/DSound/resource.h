@@ -18,8 +18,9 @@
 #define IDC_HKlavier                    1011
 #define IDC_C2Klavier                   1012
 #define IDC_Balance                     1014
-#define IDC_SLIDER2                     1015
 #define IDC_Lautstaerke                 1015
+#define IDC_CHECK1                      1022
+#define IDC_CHECKGuitar                 1022
 
 // Next default values for new objects
 // 
@@ -27,7 +28,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1018
+#define _APS_NEXT_CONTROL_VALUE         1023
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

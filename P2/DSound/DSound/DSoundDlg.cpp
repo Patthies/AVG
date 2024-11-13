@@ -45,6 +45,7 @@ BEGIN_MESSAGE_MAP(CDSoundDlg, CDialogEx)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_Balance, &CDSoundDlg::OnNMCustomdrawBalance)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_Lautstaerke, &CDSoundDlg::OnNMCustomdrawLautstaerke)
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_CHECKGuitar, &CDSoundDlg::OnBnClickedCheckguitar)
 END_MESSAGE_MAP()
 
 
@@ -65,34 +66,62 @@ BOOL CDSoundDlg::OnInitDialog()
 	// create a sound buffer 
 	if ((lpDSBSecondary = m_ds.CreateSoundBuffer(2, 16, 22050, 4)) == 0)
 		OnCancel();
-	if ((lpDSBSecondaryDreiklang = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
+	if ((lpDSBSecondaryGuitar = m_ds.CreateSoundBuffer(2, 16, 44100, 4)) == 0)
 		OnCancel();
+
 	if ((lpDSBSecondaryTonleiter = m_ds.CreateSoundBuffer(2, 16, 22050, 4)) == 0)
 		OnCancel();
+	if ((lpDSBSecondaryTonleiterGuitar = m_ds.CreateSoundBuffer(2, 16, 22050, 16)) == 0)
+		OnCancel();
+
 	if ((lpDSBSecondaryC = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
 		OnCancel();
+	if ((lpDSBSecondaryCGuitar = m_ds.CreateSoundBuffer(2, 16, 44100, 2)) == 0)
+		OnCancel();
+
 	if ((lpDSBSecondaryD = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
 		OnCancel();
-	if ((lpDSBSecondaryE = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
+	if ((lpDSBSecondaryDGuitar = m_ds.CreateSoundBuffer(2, 16, 44100, 2)) == 0)
 		OnCancel();
+
+	if ((lpDSBSecondaryE = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
+		OnCancel(); 
+	if ((lpDSBSecondaryEGuitar = m_ds.CreateSoundBuffer(2, 16, 44100, 2)) == 0)
+		OnCancel();
+
 	if ((lpDSBSecondaryF = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
 		OnCancel();
+	if ((lpDSBSecondaryFGuitar = m_ds.CreateSoundBuffer(2, 16, 44100, 2)) == 0)
+		OnCancel();
+
 	if ((lpDSBSecondaryG = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
 		OnCancel();
+	if ((lpDSBSecondaryGGuitar = m_ds.CreateSoundBuffer(2, 16, 44100, 2)) == 0)
+		OnCancel();
+
 	if ((lpDSBSecondaryA = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
 		OnCancel();
+	if ((lpDSBSecondaryAGuitar = m_ds.CreateSoundBuffer(2, 16, 44100, 2)) == 0)
+		OnCancel();
+
 	if ((lpDSBSecondaryH = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
 		OnCancel();
+	if ((lpDSBSecondaryHGuitar = m_ds.CreateSoundBuffer(2, 16, 44100, 2)) == 0)
+		OnCancel();
+
 	if ((lpDSBSecondaryC2 = m_ds.CreateSoundBuffer(2, 16, 22050, 2)) == 0)
 		OnCancel();
+	if ((lpDSBSecondaryC2Guitar = m_ds.CreateSoundBuffer(2, 16, 44100, 2)) == 0)
+		OnCancel();
+
 	if ((lpDSBSecondaryPCM = m_ds.CreateSoundBuffer(2, 16, 22050, 4)) == 0)
 		OnCancel();
 
-	m_filePosition = 0;
-	m_isPlaying = false;
-
 	// den Ton c für 2 Sekunden generieren, zyklisch
 	m_ds.GenerateSound(lpDSBSecondary,0,2,264);
+
+	// den Ton c Guitar für 2 Sekunden generieren, zyklisch
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryGuitar, 0, 1, "C.raw", 0)) OnClose();
 
 	// C-Dur Tonleiter einzelne Töne
 	int d = 264; //Hz
@@ -104,6 +133,16 @@ BOOL CDSoundDlg::OnInitDialog()
 	m_ds.GenerateSound(lpDSBSecondaryA, 0, 2, d * 5 / 3.);
 	m_ds.GenerateSound(lpDSBSecondaryH, 0, 2, d * 15 / 8.);
 	m_ds.GenerateSound(lpDSBSecondaryC2, 0, 2, d * 2);
+
+	// C-Dur Guitar Tonleiter einzelne Töne
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryCGuitar, 0, 1, "C.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryDGuitar, 0, 1, "D.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryEGuitar, 0, 1, "E.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryFGuitar, 0, 1, "F.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryGGuitar, 0, 1, "G.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryAGuitar, 0, 1, "A.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryHGuitar, 0, 1, "H.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryC2Guitar, 0, 1, "C_hoch.raw", 0)) OnClose();
 
 	// C-Dur Tonleiter Doppelpuffertechnik
 	int x = 264; //Hz
@@ -118,28 +157,20 @@ BOOL CDSoundDlg::OnInitDialog()
 	ton[8]= 0;
 	m_ds.GenerateSound(lpDSBSecondaryTonleiter, 0, 2, x);
 
+	// C-Dur Tonleiter Guitar
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryTonleiterGuitar, 0, 2, "C.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryTonleiterGuitar, 2, 2, "D.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryTonleiterGuitar, 4, 2, "E.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryTonleiterGuitar, 6, 2, "F.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryTonleiterGuitar, 8, 2, "G.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryTonleiterGuitar, 10, 2, "A.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryTonleiterGuitar, 12, 2, "H.raw", 0)) OnClose();
+	if (!m_ds.GeneratePCMSound(lpDSBSecondaryTonleiterGuitar, 14, 2, "C_hoch.raw", 0)) OnClose();
+
 	// Hole den Balance-Slider und setze ihn auf die Mittelposition (50)
 	CSliderCtrl* pBalanceSlider = (CSliderCtrl*)GetDlgItem(IDC_Balance);
 	pBalanceSlider->SetRange(0, 100);  // Slider-Bereich
 	pBalanceSlider->SetPos(50);        // Mittelposition als Standard
-
-	// Setze den Anfangswert für die Balance auf 0 Dezibel (zentriert)
-	int balanceValue = 50;             // Mittelwert des Sliders
-	LONG balanceDb = (balanceValue - 50) * 200;
-
-	// Balance-Wert auf alle Soundbuffer anwenden
-	m_ds.SetBalance(lpDSBSecondary, balanceDb);
-	m_ds.SetBalance(lpDSBSecondaryTonleiter, balanceDb);
-	m_ds.SetBalance(lpDSBSecondaryDreiklang, balanceDb);
-	m_ds.SetBalance(lpDSBSecondaryC, balanceDb);
-	m_ds.SetBalance(lpDSBSecondaryD, balanceDb);
-	m_ds.SetBalance(lpDSBSecondaryE, balanceDb);
-	m_ds.SetBalance(lpDSBSecondaryF, balanceDb);
-	m_ds.SetBalance(lpDSBSecondaryG, balanceDb);
-	m_ds.SetBalance(lpDSBSecondaryA, balanceDb);
-	m_ds.SetBalance(lpDSBSecondaryH, balanceDb);
-	m_ds.SetBalance(lpDSBSecondaryC2, balanceDb);
-	m_ds.SetBalance(lpDSBSecondaryPCM, balanceDb);
 
 	return TRUE;  // TRUE zurückgeben, wenn der Fokus nicht auf ein Steuerelement gesetzt wird
 }
@@ -180,7 +211,6 @@ HCURSOR CDSoundDlg::OnQueryDragIcon()
 void CDSoundDlg::OnBnClickedStop()
 {
 	m_ds.Stop(lpDSBSecondary);
-	m_ds.Stop(lpDSBSecondaryDreiklang);
 	m_ds.Stop(lpDSBSecondaryTonleiter);
 	m_ds.Stop(lpDSBSecondaryC);
 	m_ds.Stop(lpDSBSecondaryD);
@@ -190,20 +220,42 @@ void CDSoundDlg::OnBnClickedStop()
 	m_ds.Stop(lpDSBSecondaryA);
 	m_ds.Stop(lpDSBSecondaryH);
 	m_ds.Stop(lpDSBSecondaryC2);
+	m_ds.Stop(lpDSBSecondaryGuitar);
+	m_ds.Stop(lpDSBSecondaryTonleiterGuitar);
+	m_ds.Stop(lpDSBSecondaryCGuitar);
+	m_ds.Stop(lpDSBSecondaryDGuitar);
+	m_ds.Stop(lpDSBSecondaryEGuitar);
+	m_ds.Stop(lpDSBSecondaryFGuitar);
+	m_ds.Stop(lpDSBSecondaryGGuitar);
+	m_ds.Stop(lpDSBSecondaryAGuitar);
+	m_ds.Stop(lpDSBSecondaryHGuitar);
+	m_ds.Stop(lpDSBSecondaryC2Guitar);
 	m_ds.Stop(lpDSBSecondaryPCM);
 }
 
 void CDSoundDlg::OnBnClicked264hz()
 {
-	if (!m_ds.Play(lpDSBSecondary, true)) 
-		OnCancel();
+	if (isGuitarSound) {
+		if (!m_ds.Play(lpDSBSecondaryGuitar, true))
+			OnCancel();
+	}
+	else {
+		if (!m_ds.Play(lpDSBSecondary, true))
+			OnCancel();
+	}
 }
 
 void CDSoundDlg::OnBnClickedCtonleiter()
 {
-	if (!m_ds.Play(lpDSBSecondaryTonleiter, true))
-		OnCancel();
-	SetTimer(1, 700, 0);
+	if (isGuitarSound) {
+		if (!m_ds.Play(lpDSBSecondaryTonleiterGuitar, false))
+			OnCancel();
+	}
+	else {
+		if (!m_ds.Play(lpDSBSecondaryTonleiter, true))
+			OnCancel();
+		SetTimer(1, 700, 0);
+	}
 }
 
 void CDSoundDlg::OnBnClickedPcmsound()
@@ -217,60 +269,118 @@ void CDSoundDlg::OnBnClickedPcmsound()
 
 void CDSoundDlg::OnBnClickedCdreiklang()
 {
-	if (!m_ds.Play(lpDSBSecondaryC, false))
-		OnCancel();
-	if (!m_ds.Play(lpDSBSecondaryE, false))
-		OnCancel();
-	if (!m_ds.Play(lpDSBSecondaryG, false))
-		OnCancel();
+	if (isGuitarSound) {
+		if (!m_ds.Play(lpDSBSecondaryCGuitar, false))
+			OnCancel();
+		if (!m_ds.Play(lpDSBSecondaryEGuitar, false))
+			OnCancel();
+		if (!m_ds.Play(lpDSBSecondaryGGuitar, false))
+			OnCancel();
+	}
+	else {
+		if (!m_ds.Play(lpDSBSecondaryC, false))
+			OnCancel();
+		if (!m_ds.Play(lpDSBSecondaryE, false))
+			OnCancel();
+		if (!m_ds.Play(lpDSBSecondaryG, false))
+			OnCancel();
+	}
 }
 
 void CDSoundDlg::OnBnClickedCklavier()
 {
-	if (!m_ds.Play(lpDSBSecondaryC, false))
-		OnCancel();
+	if (isGuitarSound) {
+		if (!m_ds.Play(lpDSBSecondaryCGuitar, false))
+			OnCancel();
+	}
+	else {
+		if (!m_ds.Play(lpDSBSecondaryC, false))
+			OnCancel();
+	}
 }
 
 void CDSoundDlg::OnBnClickedDklavier()
 {
-	if (!m_ds.Play(lpDSBSecondaryD, false))
-		OnCancel();
+	if (isGuitarSound) {
+		if (!m_ds.Play(lpDSBSecondaryDGuitar, false))
+			OnCancel();
+	}
+	else {
+		if (!m_ds.Play(lpDSBSecondaryD, false))
+			OnCancel();
+	}
 }
 
 void CDSoundDlg::OnBnClickedEklavier()
 {
-	if (!m_ds.Play(lpDSBSecondaryE, false))
-		OnCancel();
+	if (isGuitarSound) {
+		if (!m_ds.Play(lpDSBSecondaryEGuitar, false))
+			OnCancel();
+	}
+	else {
+		if (!m_ds.Play(lpDSBSecondaryE, false))
+			OnCancel();
+	}
 }
 
 void CDSoundDlg::OnBnClickedFklavier()
 {
-	if (!m_ds.Play(lpDSBSecondaryF, false))
-		OnCancel();
+	if (isGuitarSound) {
+		if (!m_ds.Play(lpDSBSecondaryFGuitar, false))
+			OnCancel();
+	}
+	else {
+		if (!m_ds.Play(lpDSBSecondaryF, false))
+			OnCancel();
+	}
 }
 
 void CDSoundDlg::OnBnClickedGklavier()
 {
-	if (!m_ds.Play(lpDSBSecondaryG, false))
-		OnCancel();
+	if (isGuitarSound) {
+		if (!m_ds.Play(lpDSBSecondaryGGuitar, false))
+			OnCancel();
+	}
+	else {
+		if (!m_ds.Play(lpDSBSecondaryG, false))
+			OnCancel();
+	}
 }
 
 void CDSoundDlg::OnBnClickedAklavier()
 {
-	if (!m_ds.Play(lpDSBSecondaryA, false))
-		OnCancel();
+	if (isGuitarSound) {
+		if (!m_ds.Play(lpDSBSecondaryAGuitar, false))
+			OnCancel();
+	}
+	else {
+		if (!m_ds.Play(lpDSBSecondaryA, false))
+			OnCancel();
+	}
 }
 
 void CDSoundDlg::OnBnClickedHklavier()
 {
-	if (!m_ds.Play(lpDSBSecondaryH, false))
-		OnCancel();
+	if (isGuitarSound) {
+		if (!m_ds.Play(lpDSBSecondaryHGuitar, false))
+			OnCancel();
+	}
+	else {
+		if (!m_ds.Play(lpDSBSecondaryH, false))
+			OnCancel();
+	}
 }
 
 void CDSoundDlg::OnBnClickedC2klavier()
 {
-	if (!m_ds.Play(lpDSBSecondaryC2, false))
-		OnCancel();
+	if (isGuitarSound) {
+		if (!m_ds.Play(lpDSBSecondaryC2Guitar, false))
+			OnCancel();
+	}
+	else {
+		if (!m_ds.Play(lpDSBSecondaryC2, false))
+			OnCancel();
+	}
 }
 
 void CDSoundDlg::OnNMCustomdrawBalance(NMHDR* pNMHDR, LRESULT* pResult)
@@ -290,8 +400,6 @@ void CDSoundDlg::OnNMCustomdrawBalance(NMHDR* pNMHDR, LRESULT* pResult)
 		OnCancel();
 	if (!m_ds.SetBalance(lpDSBSecondaryTonleiter, balanceDb))
 		OnCancel();
-	if (!m_ds.SetBalance(lpDSBSecondaryDreiklang, balanceDb))
-		OnCancel();
 	if (!m_ds.SetBalance(lpDSBSecondaryC, balanceDb))
 		OnCancel();
 	if (!m_ds.SetBalance(lpDSBSecondaryD, balanceDb))
@@ -307,6 +415,26 @@ void CDSoundDlg::OnNMCustomdrawBalance(NMHDR* pNMHDR, LRESULT* pResult)
 	if (!m_ds.SetBalance(lpDSBSecondaryH, balanceDb))
 		OnCancel();
 	if (!m_ds.SetBalance(lpDSBSecondaryC2, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryGuitar, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryTonleiterGuitar, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryCGuitar, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryDGuitar, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryEGuitar, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryFGuitar, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryGGuitar, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryAGuitar, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryHGuitar, balanceDb))
+		OnCancel();
+	if (!m_ds.SetBalance(lpDSBSecondaryC2Guitar, balanceDb))
 		OnCancel();
 	if (!m_ds.SetBalance(lpDSBSecondaryPCM, balanceDb))
 		OnCancel();
@@ -329,8 +457,6 @@ void CDSoundDlg::OnNMCustomdrawLautstaerke(NMHDR* pNMHDR, LRESULT* pResult)
 		OnCancel();
 	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryTonleiter, volumeDb))
 		OnCancel();
-	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryDreiklang, volumeDb))
-		OnCancel();
 	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryC, volumeDb))
 		OnCancel();
 	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryD, volumeDb))
@@ -347,8 +473,29 @@ void CDSoundDlg::OnNMCustomdrawLautstaerke(NMHDR* pNMHDR, LRESULT* pResult)
 		OnCancel();
 	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryC2, volumeDb))
 		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryGuitar, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryTonleiterGuitar, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryCGuitar, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryDGuitar, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryEGuitar, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryFGuitar, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryGGuitar, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryAGuitar, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryHGuitar, volumeDb))
+		OnCancel();
+	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryC2Guitar, volumeDb))
+		OnCancel();
 	if (!m_ds.SetPlaybackVolume(lpDSBSecondaryPCM, volumeDb))
 		OnCancel();
+
 }
 
 void CDSoundDlg::OnTimer(UINT_PTR nIDEvent)
@@ -380,7 +527,7 @@ void CDSoundDlg::OnTimer(UINT_PTR nIDEvent)
 			KillTimer(1); return;
 		}
 		if (((playpos > 50) && (buffnr == 0)) || ((playpos < 50) && (buffnr == 1))) {
-			if ((++j) == 9) { // major scale finished
+			if ((++j) == 9) { 
 				KillTimer(1);
 				j = 0;
 				if (!m_ds.Stop(lpDSBSecondaryPCM))
@@ -388,10 +535,16 @@ void CDSoundDlg::OnTimer(UINT_PTR nIDEvent)
 				return;
 			}
 			m_ds.GeneratePCMSound(lpDSBSecondaryPCM, buffnr * 2, 2, "sound.pcm", j);
-			if (buffnr == 1) buffnr = 0; // change buffer
+			if (buffnr == 1) buffnr = 0; 
 			else buffnr = 1;
 		}
 	}
 
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CDSoundDlg::OnBnClickedCheckguitar()
+{
+	isGuitarSound = !isGuitarSound;
 }
