@@ -23,10 +23,12 @@ CDirectShowPlayerDlg::CDirectShowPlayerDlg(CWnd* pParent /*=nullptr*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
+
 void CDirectShowPlayerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 }
+
 
 BEGIN_MESSAGE_MAP(CDirectShowPlayerDlg, CDialogEx)
 	ON_WM_PAINT()
@@ -67,9 +69,6 @@ BOOL CDirectShowPlayerDlg::OnInitDialog()
 	return TRUE;  // TRUE zurückgeben, wenn der Fokus nicht auf ein Steuerelement gesetzt wird
 }
 
-// Wenn Sie dem Dialogfeld eine Schaltfläche "Minimieren" hinzufügen, benötigen Sie
-//  den nachstehenden Code, um das Symbol zu zeichnen.  Für MFC-Anwendungen, die das 
-//  Dokument/Ansicht-Modell verwenden, wird dies automatisch ausgeführt.
 
 void CDirectShowPlayerDlg::OnPaint()
 {
@@ -96,6 +95,7 @@ void CDirectShowPlayerDlg::OnPaint()
 	}
 }
 
+
 // Die System ruft diese Funktion auf, um den Cursor abzufragen, der angezeigt wird, während der Benutzer
 //  das minimierte Fenster mit der Maus zieht.
 HCURSOR CDirectShowPlayerDlg::OnQueryDragIcon()
@@ -104,11 +104,10 @@ HCURSOR CDirectShowPlayerDlg::OnQueryDragIcon()
 }
 
 
-
 void CDirectShowPlayerDlg::OnBnClickedPlay()
 {
 	if (m_FilePath.IsEmpty()) {
-		AfxMessageBox(L"Bitte wählen Sie eine Datei aus.");
+		AfxMessageBox(L"Bitte Dateiwahl teffen.");
 		return;
 	}
 
@@ -167,6 +166,7 @@ LRESULT CDirectShowPlayerDlg::GetIt(WPARAM wparam, LPARAM lparam) {
 	}
 	return 0;
 }
+
 
 void CDirectShowPlayerDlg::CleanUp() { 
 	if (pVidWin) { pVidWin->put_Visible(OAFALSE); 
@@ -228,8 +228,16 @@ void CDirectShowPlayerDlg::OnBnClickedStop()
 
 void CDirectShowPlayerDlg::OnBnClickedClose()
 {
-	CleanUp(); 
-	CDialogEx::OnClose(); 
+	// Aufräumen der DirectShow-Komponenten
+	CleanUp();
+
+	CDialogEx::OnClose();
+
+	// Timer stoppen
+	KillTimer(1);
+
+	// Dialog schließen durch Beenden
+	EndDialog(IDOK);
 }
 
 
@@ -272,6 +280,7 @@ void CDirectShowPlayerDlg::OnBnClickedVollbild()
 	Vollbild(true);
 }
 
+
 void CDirectShowPlayerDlg::Vollbild(bool v) { 
 	if (pGraph) { 
 		IVideoWindow* pVidWin1 = NULL; 
@@ -280,6 +289,7 @@ void CDirectShowPlayerDlg::Vollbild(bool v) {
 		pVidWin1->Release();
 	} 
 }
+
 
 void CDirectShowPlayerDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -295,9 +305,9 @@ void CDirectShowPlayerDlg::OnBnClickedSelectfile()
 	if (dlg.DoModal() == IDOK)
 	{
 		m_FilePath = dlg.GetPathName(); // Speichere den ausgewählten Dateipfad
-		OnBnClickedPlay(); // Rufe die Play-Methode auf
 	}
 }
+
 
 void CDirectShowPlayerDlg::OnDropFiles(HDROP hDropInfo)
 {
@@ -306,5 +316,4 @@ void CDirectShowPlayerDlg::OnDropFiles(HDROP hDropInfo)
 	DragFinish(hDropInfo);
 
 	m_FilePath = szFileName; // Speichere den Dateipfad
-	OnBnClickedPlay(); // Rufe die Play-Methode auf
 }

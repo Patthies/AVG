@@ -24,7 +24,7 @@ public:
 // Implementierung
 protected:
 	HICON m_hIcon;
-	IGraphBuilder* pGraph; // ein Zeiger auf das COM-Interface
+	IGraphBuilder* pGraph;
 	IMediaControl* pMediaControl;
 	IMediaEventEx* pEvent;
 	IVideoWindow* pVidWin = NULL;
@@ -37,7 +37,6 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
-public:
 public:
 	CString m_FilePath; // Speichert den Dateipfad
 	afx_msg void OnDropFiles(HDROP hDropInfo); // Drag-and-Drop-Verarbeitung
