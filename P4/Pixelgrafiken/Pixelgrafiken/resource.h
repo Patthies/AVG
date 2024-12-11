@@ -25,7 +25,6 @@
 #define IDC_FLIPV                       1024
 #define IDC_INVERSE                     1025
 #define IDC_SMALLER                     1028
-#define IDC_BUTTON3                     1029
 #define IDC_BIGGER                      1029
 
 // Next default values for new objects

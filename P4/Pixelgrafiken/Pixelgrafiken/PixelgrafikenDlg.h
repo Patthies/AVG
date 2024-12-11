@@ -53,4 +53,7 @@ public:
 	afx_msg void OnBnClickedSmaller();
 	afx_msg void OnBnClickedAbdunkeln();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnBnClickedEmboss();
+	afx_msg void OnBnClickedKanten();
+	afx_msg void OnBnClickedRelief();
 };

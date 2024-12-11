@@ -51,6 +51,9 @@ BEGIN_MESSAGE_MAP(CPixelgrafikenDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_SMALLER, &CPixelgrafikenDlg::OnBnClickedSmaller)
 	ON_BN_CLICKED(IDC_ABDUNKELN, &CPixelgrafikenDlg::OnBnClickedAbdunkeln)
 	ON_WM_LBUTTONDOWN()
+	ON_BN_CLICKED(IDC_EMBOSS, &CPixelgrafikenDlg::OnBnClickedEmboss)
+	ON_BN_CLICKED(IDC_KANTEN, &CPixelgrafikenDlg::OnBnClickedKanten)
+	ON_BN_CLICKED(IDC_RELIEF, &CPixelgrafikenDlg::OnBnClickedRelief)
 END_MESSAGE_MAP()
 
 
@@ -223,13 +226,42 @@ void CPixelgrafikenDlg::OnBnClickedBlue()
 
 void CPixelgrafikenDlg::OnBnClickedSharpness()
 { 
-
+	int f = 1; 
+	int sharpen_matrix[9] = { -f,-f,-f,-f,9 * f,-f,-f,-f,-f }; 
+	m_dib.matrix(sharpen_matrix, 1, f);
+	RedrawWindow();			// sende WM_PAINT-Ereignis
 }
 
 
 void CPixelgrafikenDlg::OnBnClickedUnsharp()
 {
-	// TODO: Fügen Sie hier Ihren Handlercode für Benachrichtigungen des Steuerelements ein.
+	int soften_matrix[9] = { 6,12,6,12,25,12,6,12,6 }; 
+	m_dib.matrix(soften_matrix, 1, 97);
+	RedrawWindow();			// sende WM_PAINT-Ereignis
+}
+
+
+void CPixelgrafikenDlg::OnBnClickedEmboss()
+{
+	int emboss_matrix[9] = { -1,0,0,0,0,0,0,0,1 }; 
+	m_dib.matrix(emboss_matrix, 1, 1, 127);
+	RedrawWindow();			// sende WM_PAINT-Ereignis
+}
+
+
+void CPixelgrafikenDlg::OnBnClickedKanten()
+{
+	int edge_matrix[9] = { -1,-1,-1,-1,8,-1,-1,-1,-1 }; 
+	m_dib.matrix(edge_matrix, 1, 1);
+	RedrawWindow();			// sende WM_PAINT-Ereignis
+}
+
+
+void CPixelgrafikenDlg::OnBnClickedRelief()
+{
+	int relief_matrix[9] = { -2,-1,0,-1,1,1,0,1,2 }; 
+	m_dib.matrix(relief_matrix, 1, 1);
+	RedrawWindow();			// sende WM_PAINT-Ereignis
 }
 
 
