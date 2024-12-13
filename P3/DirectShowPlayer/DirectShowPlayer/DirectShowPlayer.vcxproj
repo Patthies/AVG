@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{DC6774ED-8122-4068-BABA-C50175228EAB}</ProjectGuid>
+    <ProjectGuid>{1DB860C2-DAC1-417A-AFBE-3AF4AD1DF3C0}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
     <RootNamespace>DirectShowPlayer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
@@ -185,6 +185,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DirectShowMain.h" />
     <ClInclude Include="DirectShowPlayer.h" />
     <ClInclude Include="DirectShowPlayerDlg.h" />
     <ClInclude Include="framework.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DirectShowMain.cpp" />
     <ClCompile Include="DirectShowPlayer.cpp" />
     <ClCompile Include="DirectShowPlayerDlg.cpp" />
     <ClCompile Include="pch.cpp">
