@@ -59,5 +59,5 @@ public:
 	afx_msg void OnBnClickedLoadjpg();
 	afx_msg void OnBnClickedSavejpg();
 	afx_msg void OnNMCustomdrawSliderjpg(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnStnClickedSlidervalue();
+	afx_msg void OnBnClickedInverse();
 };

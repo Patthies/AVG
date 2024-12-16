@@ -57,6 +57,7 @@ BEGIN_MESSAGE_MAP(CPixelgrafikenDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_LOADJPG, &CPixelgrafikenDlg::OnBnClickedLoadjpg)
 	ON_BN_CLICKED(IDC_SAVEJPG, &CPixelgrafikenDlg::OnBnClickedSavejpg)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDERJPG, &CPixelgrafikenDlg::OnNMCustomdrawSliderjpg)
+	ON_BN_CLICKED(IDC_INVERSE, &CPixelgrafikenDlg::OnBnClickedInverse)
 END_MESSAGE_MAP()
 
 
@@ -324,6 +325,12 @@ void CPixelgrafikenDlg::OnBnClickedFlipv()
 {
 	m_dib.flip('v');	// flip vertikal
 	RedrawWindow();		// sende WM_PAINT-Ereignis
+}
+
+
+void CPixelgrafikenDlg::OnBnClickedInverse()
+{
+	// TODO: Fügen Sie hier Ihren Handlercode für Benachrichtigungen des Steuerelements ein.
 }
 
 
