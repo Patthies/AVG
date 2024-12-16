@@ -54,6 +54,9 @@ BEGIN_MESSAGE_MAP(CPixelgrafikenDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_EMBOSS, &CPixelgrafikenDlg::OnBnClickedEmboss)
 	ON_BN_CLICKED(IDC_KANTEN, &CPixelgrafikenDlg::OnBnClickedKanten)
 	ON_BN_CLICKED(IDC_RELIEF, &CPixelgrafikenDlg::OnBnClickedRelief)
+	ON_BN_CLICKED(IDC_LOADJPG, &CPixelgrafikenDlg::OnBnClickedLoadjpg)
+	ON_BN_CLICKED(IDC_SAVEJPG, &CPixelgrafikenDlg::OnBnClickedSavejpg)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDERJPG, &CPixelgrafikenDlg::OnNMCustomdrawSliderjpg)
 END_MESSAGE_MAP()
 
 
@@ -67,6 +70,13 @@ BOOL CPixelgrafikenDlg::OnInitDialog()
 	//  wenn das Hauptfenster der Anwendung kein Dialogfeld ist
 	SetIcon(m_hIcon, TRUE);			// Großes Symbol verwenden
 	SetIcon(m_hIcon, FALSE);		// Kleines Symbol verwenden
+
+	CSliderCtrl* pSlider = (CSliderCtrl*)GetDlgItem(IDC_SLIDERJPG);
+	if (pSlider)
+	{
+		pSlider->SetRange(0, 100);
+		pSlider->SetPos(90); // Standardwert auf 90 setzen
+	}
 
 	return TRUE;  // TRUE zurückgeben, wenn der Fokus nicht auf ein Steuerelement gesetzt wird
 }
@@ -128,14 +138,52 @@ void CPixelgrafikenDlg::OnMouseMove(UINT nFlags, CPoint point)
 
 void CPixelgrafikenDlg::OnBnClickedLoad()
 {
-	m_dib.Load(L"bild.bmp");	// Bild öffnen
-	RedrawWindow();				// sende WM_PAINT-Ereignis
+	m_dib.Load(L"bild.bmp");		// bmp Bild öffnen
+	RedrawWindow();					// sende WM_PAINT-Ereignis
+}
+
+
+void CPixelgrafikenDlg::OnBnClickedLoadjpg()
+{
+	m_dib.LoadJpeg(L"bild.jpg");	// jpg Bild öffnen
+	RedrawWindow();					// sende WM_PAINT-Ereignis
 }
 
 
 void CPixelgrafikenDlg::OnBnClickedSave()
 {
 	m_dib.Save(L"save.bmp");
+}
+
+
+void CPixelgrafikenDlg::OnBnClickedSavejpg()
+{
+	// Sliderwert abrufen
+	CSliderCtrl* pSlider = (CSliderCtrl*)GetDlgItem(IDC_SLIDERJPG);
+	int compressionValue = 90; // Fallback, falls Slider nicht gefunden wird
+	if (pSlider)
+	{
+		compressionValue = pSlider->GetPos();
+	}
+
+	m_dib.SaveJpeg(L"bild.jpg", compressionValue);
+}
+
+
+void CPixelgrafikenDlg::OnNMCustomdrawSliderjpg(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	CSliderCtrl* pSlider = (CSliderCtrl*)GetDlgItem(IDC_SLIDERJPG);
+	if (pSlider)
+	{
+		int sliderValue = pSlider->GetPos();
+
+		// Den Wert in einem Static-Text anzeigen
+		CString strValue;
+		strValue.Format(L"%d", sliderValue);
+		SetDlgItemText(IDC_SLIDERVALUE, strValue); // IDC_STATIC_SLIDERVALUE ist die ID des Static-Controls
+	}
+
+	*pResult = 0;
 }
 
 
@@ -292,9 +340,8 @@ void CPixelgrafikenDlg::OnBnClickedSmaller()
 
 
 void CPixelgrafikenDlg::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	m_dib.Load(L"bild.bmp");	// Bild öffnen
-	RedrawWindow();				// sende WM_PAINT-Ereignis
+{	
+	OnBnClickedLoad();
 
 	CDialogEx::OnLButtonDown(nFlags, point);
 }

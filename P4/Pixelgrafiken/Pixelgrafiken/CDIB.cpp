@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "CDIB.h"
 
+extern "C" {
+#include "jpeglib.h"
+}
 
 CDIB::CDIB() {
 	m_pBMFH = 0;
@@ -348,4 +351,119 @@ void CDIB::flip(char c) {
 			break;
 		}
 	}
+}
+
+
+bool CDIB::SaveJpeg(CString FileName, int quality) {
+	if (m_pBMFH == 0) return false;
+
+	struct jpeg_compress_struct cinfo;		/* Initialisierung */ 
+	struct jpeg_error_mgr jerr; 
+	cinfo.err = jpeg_std_error(&jerr); 
+	jpeg_create_compress(&cinfo); 
+	
+	FILE * outfile;							/* Ausgabedatei festlegen */ 
+	if ((outfile = _wfopen(FileName, L"wb")) == 0) { 
+		CString s; s.Format(L"can't open %s\n", FileName); 
+		AfxMessageBox(s); return false; 
+	} 
+	jpeg_stdio_dest(&cinfo, outfile);
+	
+	cinfo.image_width = m_pBMI->bmiHeader.biWidth; 
+	cinfo.image_height = m_pBMI->bmiHeader.biHeight; 
+	cinfo.input_components = m_pBMI->bmiHeader.biBitCount/8; 
+	if (cinfo.input_components==3) 
+		cinfo.in_color_space = JCS_RGB;		/* Farbraum */ 
+	else 
+		cinfo.in_color_space = JCS_GRAYSCALE; 
+	jpeg_set_defaults(&cinfo);
+
+	jpeg_set_quality(&cinfo,quality,TRUE);	/* Komprimierungsqualität */ 
+
+	jpeg_start_compress(&cinfo, TRUE);		/* Komrimierung starten */ 
+	
+	BYTE *adr, h, *line = new BYTE[StorageWidth()]; 
+	while (cinfo.next_scanline < cinfo.image_height) { 
+		adr = (unsigned char*)GetPixelAddress(0,cinfo.next_scanline); 
+		memcpy(line, adr, StorageWidth()); 
+		
+		for (int j=0;j<(DibWidth()*3);j+=3) {  // BGR->RGB 
+			h=line[j]; 
+			line[j]=line[j+2]; 
+			line[j+2]=h; 
+		} 
+		jpeg_write_scanlines(&cinfo, &line, 1);        
+	} // Zeile schreiben 
+	
+	jpeg_finish_compress(&cinfo);             
+	fclose(outfile);		/* Komrimierung beenden */ 
+	
+	delete [] line; 
+	jpeg_destroy_compress(&cinfo);
+
+	return true;
+}
+
+
+bool CDIB::LoadJpeg(CString FileName) {
+	if (m_pBMFH != 0) delete[] m_pBMFH; 
+	
+	struct jpeg_decompress_struct cinfo;            
+	struct jpeg_error_mgr jerr; 
+	cinfo.err = jpeg_std_error(&jerr); 
+	jpeg_create_decompress(&cinfo);			/* Initialisierung */ 
+	
+	FILE * infile;
+	if ((infile = _wfopen(FileName, L"rb")) == 0) { 
+		CString s; s.Format(L"can't open %s", FileName); 
+		AfxMessageBox(s); return false; 
+	} 
+	jpeg_stdio_src(&cinfo, infile);			/* Datei öffnen */ 
+	
+	jpeg_read_header(&cinfo, TRUE);			/* Bildheader (Metadaten) lesen */ 
+	
+	if (cinfo.num_components != 3) {		// 24 bit test 
+		AfxMessageBox(L"We support only 24 Bit RGB pictures!!!"); 
+		fclose (infile); return false; 
+	} 
+	jpeg_start_decompress(&cinfo); 
+	
+	int bytes_per_line =					/* Speicher allocieren */ 
+		(cinfo.output_width * cinfo.num_components + 3) & ~3; 
+	int bytes_per_picture = cinfo.output_height * bytes_per_line; 
+	m_dwLength = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFO) + bytes_per_picture; 
+	
+	if ((m_pBMFH = (BITMAPFILEHEADER*) new char[m_dwLength]) == 0) { 
+		AfxMessageBox(L"Unable to allocate BITMAP-Memory"); 
+		return false; 
+	}
+
+	m_pBMFH->bfType = 0x4d42;				/* BITMAPFILEHEADER */ 
+	m_pBMFH->bfReserved1 = m_pBMFH->bfReserved2 = 0; 
+	m_pBMFH->bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFO);		/* BITMAPINFOHEADER */ 
+	m_pBMI = (BITMAPINFO*) ((unsigned char*) m_pBMFH + sizeof(BITMAPFILEHEADER)); 
+	m_pBMI->bmiHeader.biSize = sizeof(BITMAPINFOHEADER); 
+	m_pBMI->bmiHeader.biWidth = cinfo.output_width; 
+	m_pBMI->bmiHeader.biHeight = cinfo.output_height; 
+	m_pBMI->bmiHeader.biPlanes = 1; m_pBMI->bmiHeader.biBitCount = cinfo.num_components * 8; 
+	m_pBMI->bmiHeader.biCompression = BI_RGB; m_pBMI->bmiHeader.biSizeImage = 
+		m_pBMI->bmiHeader.biXPelsPerMeter = m_pBMI->bmiHeader.biYPelsPerMeter = 
+		m_pBMI->bmiHeader.biClrUsed = m_pBMI->bmiHeader.biClrImportant = 0; 
+	m_pBits = (unsigned char*) m_pBMFH + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFO);		/* Pixeldaten */ 
+	
+	/* Dekomprimierungsschleife */ 
+	unsigned char *adr, h; 
+	while (cinfo.output_scanline < cinfo.output_height) { 
+		adr = (unsigned char*) GetPixelAddress(0, cinfo.output_scanline); 
+		jpeg_read_scanlines(&cinfo, &adr, 1); 
+		
+		for (int j=0;j<(DibWidth()*3);j+=3) {  // RGB -> BGR convert 
+			h=adr[j]; adr[j]=adr[j+2]; adr[j+2]=h; 
+		} 
+	} 
+	jpeg_finish_decompress(&cinfo);            
+	jpeg_destroy_decompress(&cinfo); 
+	fclose(infile);
+
+	return true; 
 }

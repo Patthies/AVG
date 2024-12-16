@@ -26,6 +26,10 @@
 #define IDC_INVERSE                     1025
 #define IDC_SMALLER                     1028
 #define IDC_BIGGER                      1029
+#define IDC_LOADJPG                     1030
+#define IDC_SAVEJPG                     1031
+#define IDC_SLIDERJPG                   1032
+#define IDC_SLIDERVALUE                 1033
 
 // Next default values for new objects
 // 
@@ -33,7 +37,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1030
+#define _APS_NEXT_CONTROL_VALUE         1034
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -22,6 +22,8 @@ public:
 	void CDIB::rgb(char ch);
 	void CDIB::matrix(int* matrix, int matrixsize, int koeff, char offset = 0);
 	void CDIB::flip(char c);
+	bool CDIB::SaveJpeg(CString FileName, int quality);
+	bool CDIB::LoadJpeg(CString FileName);
 
 protected:
 	BITMAPFILEHEADER* m_pBMFH;		// Pointer to BITMAPFILEHEADER 
