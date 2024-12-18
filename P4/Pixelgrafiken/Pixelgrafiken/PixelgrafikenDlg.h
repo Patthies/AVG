@@ -25,6 +25,7 @@ public:
 protected:
 	HICON m_hIcon;
 	CDIB m_dib;
+	float m_fScale;  // Skalierungsfaktor
 
 	// Generierte Funktionen für die Meldungstabellen
 	virtual BOOL OnInitDialog();

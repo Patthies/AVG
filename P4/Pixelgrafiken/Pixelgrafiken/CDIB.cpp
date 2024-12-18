@@ -107,6 +107,27 @@ void CDIB::Draw(CDC* pDC, int x, int y) {
 }
 
 
+void CDIB::DrawRect(CDC* pDC, CRect rect)
+{
+	if (m_pBMFH != 0) {
+		pDC->SetStretchBltMode(HALFTONE);
+		StretchDIBits(pDC->GetSafeHdc(),
+			rect.left,           // Destination x
+			rect.top,            // Destination y
+			rect.Width(),        // Destination width
+			rect.Height(),       // Destination height
+			0,                   // Source x
+			0,                   // Source y
+			DibWidth(),          // Source width
+			DibHeight(),         // Source height
+			m_pBits,            // Pointer to bits
+			m_pBMI,             // BITMAPINFO
+			DIB_RGB_COLORS,     // Options
+			SRCCOPY);           // Raster operation code (ROP)
+	}
+}
+
+
 void* CDIB::GetPixelAddress(int x, int y) {
 	int iWidth;
 	if ((x >= DibWidth()) || (y >= DibHeight())) {

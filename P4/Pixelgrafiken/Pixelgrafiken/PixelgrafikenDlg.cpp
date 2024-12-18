@@ -19,6 +19,7 @@
 
 CPixelgrafikenDlg::CPixelgrafikenDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_PIXELGRAFIKEN_DIALOG, pParent)
+	, m_fScale(1.0f)  // Standardskalierung = 100%
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -89,12 +90,11 @@ BOOL CPixelgrafikenDlg::OnInitDialog()
 
 void CPixelgrafikenDlg::OnPaint()
 {
-	CPaintDC dc(this); // Gerätekontext zum Zeichnen
 	if (IsIconic())
 	{
+		CPaintDC dc(this);
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// Symbol in Clientrechteck zentrieren
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -102,16 +102,38 @@ void CPixelgrafikenDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// Symbol zeichnen
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
 	{
-		m_dib.Draw(&dc, 0, 0);
+		CPaintDC dc(this);
 
-		CDialogEx::OnPaint();
+		if (m_dib.DibWidth() > 0 && m_dib.DibHeight() > 0)
+		{
+			CRect clientRect;
+			GetClientRect(&clientRect);
+
+			// Berechne die skalierten Dimensionen
+			int scaledWidth = static_cast<int>(m_dib.DibWidth() * m_fScale);
+			int scaledHeight = static_cast<int>(m_dib.DibHeight() * m_fScale);
+
+			// Setze die Startposition auf (0, 0)
+			int x = 0;
+			int y = 0;
+
+			// Definiere das Rechteck für das skalierte Bild
+			CRect drawRect(x, y, x + scaledWidth, y + scaledHeight);
+
+			// Zeichne das Bild an den neuen Koordinaten
+			m_dib.DrawRect(&dc, drawRect);
+		}
+		else
+		{
+			CDialogEx::OnPaint();
+		}
 	}
 }
+
 
 
 // Die System ruft diese Funktion auf, um den Cursor abzufragen, der angezeigt wird, während der Benutzer
@@ -185,7 +207,7 @@ void CPixelgrafikenDlg::OnNMCustomdrawSliderjpg(NMHDR* pNMHDR, LRESULT* pResult)
 		{
 			// Slider-Wert in einen CString konvertieren
 			CString strValue;
-			strValue.Format(_T("%d"), sliderValue);
+			strValue.Format(L"%d", sliderValue);
 
 			// Static Text aktualisieren
 			pStaticText->SetWindowTextW(strValue);
@@ -205,7 +227,7 @@ void CPixelgrafikenDlg::OnBnClickedAufhellen()
 
 void CPixelgrafikenDlg::OnBnClickedAbdunkeln()
 {
-	m_dib.brighten(-10); // Aufhellen um 10 Prozent 
+	m_dib.brighten(-10); // Abdunkeln um 10 Prozent 
 	RedrawWindow();     // sende WM_PAINT-Ereignis
 }
 
@@ -338,13 +360,20 @@ void CPixelgrafikenDlg::OnBnClickedFlipv()
 
 void CPixelgrafikenDlg::OnBnClickedBigger()
 {
-	// TODO: Fügen Sie hier Ihren Handlercode für Benachrichtigungen des Steuerelements ein.
+	m_fScale *= 1.2f;  // Vergrößere um 20%
+	Invalidate();
 }
 
 
 void CPixelgrafikenDlg::OnBnClickedSmaller()
 {
-	// TODO: Fügen Sie hier Ihren Handlercode für Benachrichtigungen des Steuerelements ein.
+	m_fScale *= 0.8f;  // Verkleinere um 20%
+
+	// Verhindere zu starkes Verkleinern
+	if (m_fScale < 0.1f)
+		m_fScale = 0.1f;
+
+	Invalidate();
 }
 
 

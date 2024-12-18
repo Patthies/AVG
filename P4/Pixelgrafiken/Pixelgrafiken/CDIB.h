@@ -24,6 +24,7 @@ public:
 	void CDIB::flip(char c);
 	bool CDIB::SaveJpeg(CString FileName, int quality);
 	bool CDIB::LoadJpeg(CString FileName);
+	void CDIB::DrawRect(CDC* pDC, CRect rect);
 
 protected:
 	BITMAPFILEHEADER* m_pBMFH;		// Pointer to BITMAPFILEHEADER 
