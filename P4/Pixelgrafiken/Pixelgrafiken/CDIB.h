@@ -14,6 +14,7 @@ public:
 	int CDIB::StorageWidth();
 
 	void CDIB::brighten(int value);
+	void CDIB::darken(int value);
 	void CDIB::negative();
 	void CDIB::grey();
 	void CDIB::histogramm(float* h, float zoom = 0.1f);

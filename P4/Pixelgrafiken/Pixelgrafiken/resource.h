@@ -2,6 +2,7 @@
 // Von Microsoft Visual C++ generierte Includedatei.
 // Verwendet durch Pixelgrafiken.rc
 //
+#define IDD_BLENDING                    8
 #define IDD_PIXELGRAFIKEN_DIALOG        102
 #define IDR_MAINFRAME                   128
 #define IDC_AUFHELLEN                   1000
@@ -30,16 +31,17 @@
 #define IDC_SAVEJPG                     1031
 #define IDC_SLIDERJPG                   1032
 #define IDC_SLIDERVALUE                 1033
-#define IDC_SLIDER1                     1034
-#define IDC_SLIDERBLENDING              1034
+#define IDC_SLIDER1                     1035
+#define IDC_SLIDERBLENDING              1035
+#define IDC_BLENDINGVALUE               1036
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        130
+#define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1035
+#define _APS_NEXT_CONTROL_VALUE         1037
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

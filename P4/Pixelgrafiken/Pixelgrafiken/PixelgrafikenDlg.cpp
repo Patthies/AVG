@@ -8,6 +8,7 @@
 #include "PixelgrafikenDlg.h"
 #include "afxdialogex.h"
 #include "CDIB.h"
+#include "CBlendingDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -227,7 +228,7 @@ void CPixelgrafikenDlg::OnBnClickedAufhellen()
 
 void CPixelgrafikenDlg::OnBnClickedAbdunkeln()
 {
-	m_dib.brighten(-10); // Abdunkeln um 10 Prozent 
+	m_dib.darken(-10); // Abdunkeln um 10 Prozent 
 	RedrawWindow();     // sende WM_PAINT-Ereignis
 }
 
@@ -278,7 +279,51 @@ void CPixelgrafikenDlg::OnBnClickedKontrast()
 
 void CPixelgrafikenDlg::OnBnClickedBlending()
 {
-	// TODO: Fügen Sie hier Ihren Handlercode für Benachrichtigungen des Steuerelements ein.
+	if (m_dib.DibWidth() == 0 || m_dib.DibHeight() == 0)
+	{
+		AfxMessageBox(L"Kein Ausgangsbild geladen!");
+		return;
+	}
+
+	// Zweites Bild laden
+	CFileDialog dlg(TRUE, NULL, NULL,
+		OFN_HIDEREADONLY | OFN_FILEMUSTEXIST,
+		L"Image Files (*.bmp;*.jpg;*.jpeg)|*.bmp;*.jpg;*.jpeg|All Files (*.*)|*.*||");
+
+	if (dlg.DoModal() == IDOK)
+	{
+		CString ext = dlg.GetFileExt().MakeLower();
+		bool loadSuccess = false;
+
+		// Temporäres Bild laden
+		if (ext == L"bmp")
+			loadSuccess = m_dibTemp.Load(dlg.GetPathName());
+		else if (ext == L"jpg" || ext == L"jpeg")
+			loadSuccess = m_dibTemp.LoadJpeg(dlg.GetPathName());
+
+		if (!loadSuccess)
+		{
+			AfxMessageBox(L"Fehler beim Laden des zweiten Bildes!");
+			return;
+		}
+
+		// Prüfen ob die Bilder die gleiche Größe haben
+		if (m_dib.DibWidth() != m_dibTemp.DibWidth() ||
+			m_dib.DibHeight() != m_dibTemp.DibHeight())
+		{
+			AfxMessageBox(L"Die Bilder müssen die gleiche Größe haben!");
+			return;
+		}
+
+		// Blending-Dialog anzeigen
+		CBlendingDlg dlgBlend(this);
+		if (dlgBlend.DoModal() == IDOK)
+		{
+			CDIB tempDib = m_dib;  // Original sichern
+			m_dib.blending(tempDib, m_dibTemp, dlgBlend.GetBlendValue());
+			Invalidate();
+		}
+	}
 }
 
 

@@ -154,16 +154,26 @@ void CDIB::brighten(int value) {
 	for (int i = 0; i < DibHeight(); i++) {
 		t = (BYTE*)GetPixelAddress(0, i);
 		for (int j = 0; j < width; j += 3) {
-			if (value > 0) { // Aufhellen
-				*(t + j) += (BYTE)((255 - *(t + j)) * (value / 100.f));
-				*(t + j + 1) += (BYTE)((255 - *(t + j + 1)) * (value / 100.f));
-				*(t + j + 2) += (BYTE)((255 - *(t + j + 2)) * (value / 100.f));
-			}
-			else { // Abdunkeln
-				*(t + j) = max(0, *(t + j) + (int)(*(t + j) * (value / 100.f)));
-				*(t + j + 1) = max(0, *(t + j + 1) + (int)(*(t + j + 1) * (value / 100.f)));
-				*(t + j + 2) = max(0, *(t + j + 2) + (int)(*(t + j + 2) * (value / 100.f)));
-			}
+			*(t + j) += (BYTE)((255 - *(t + j)) * (value / 100.f));
+			*(t + j + 1) += (BYTE)((255 - *(t + j + 1)) * (value / 100.f));
+			*(t + j + 2) += (BYTE)((255 - *(t + j + 2)) * (value / 100.f));
+		}
+	}
+}
+
+
+void CDIB::darken(int value) {
+	if ((m_pBMFH == 0) || (m_pBMI->bmiHeader.biBitCount != 24) || (value < -100) || (value > 100))
+		return; // do nothing (not supported) 
+
+	BYTE* t;
+	int width = DibWidth() * 3;
+	for (int i = 0; i < DibHeight(); i++) {
+		t = (BYTE*)GetPixelAddress(0, i);
+		for (int j = 0; j < width; j += 3) {
+			*(t + j) = max(0, *(t + j) + (int)(*(t + j) * (value / 100.f)));
+			*(t + j + 1) = max(0, *(t + j + 1) + (int)(*(t + j + 1) * (value / 100.f)));
+			*(t + j + 2) = max(0, *(t + j + 2) + (int)(*(t + j + 2) * (value / 100.f)));
 		}
 	}
 }
