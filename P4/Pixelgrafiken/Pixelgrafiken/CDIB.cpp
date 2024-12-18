@@ -364,7 +364,8 @@ bool CDIB::SaveJpeg(CString FileName, int quality) {
 	
 	FILE * outfile;							/* Ausgabedatei festlegen */ 
 	if ((outfile = _wfopen(FileName, L"wb")) == 0) { 
-		CString s; s.Format(L"can't open %s\n", FileName); 
+		CString s; 
+		s.Format(L"can't open %s\n", FileName); 
 		AfxMessageBox(s); return false; 
 	} 
 	jpeg_stdio_dest(&cinfo, outfile);
@@ -415,7 +416,8 @@ bool CDIB::LoadJpeg(CString FileName) {
 	
 	FILE * infile;
 	if ((infile = _wfopen(FileName, L"rb")) == 0) { 
-		CString s; s.Format(L"can't open %s", FileName); 
+		CString s; 
+		s.Format(L"can't open %s", FileName); 
 		AfxMessageBox(s); return false; 
 	} 
 	jpeg_stdio_src(&cinfo, infile);			/* Datei öffnen */ 
