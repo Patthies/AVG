@@ -25,7 +25,7 @@ void CBlendingDlg::DoDataExchange(CDataExchange* pDX)
     if (!pDX->m_bSaveAndValidate)
     {
         m_blendSlider.SetRange(0, 100);  // Setze den Wertebereich des Sliders (0-100%)
-        m_blendSlider.SetPos(m_blendValue);  // Setze den Anfangswert des Sliders (50%)
+        m_blendSlider.SetPos(m_blendValue);  // Setze den Anfangswert des Sliders (0%)
         UpdateLabel();  // Textanzeige für den Slider-Wert aktualisieren
     }
 }
@@ -52,9 +52,8 @@ void CBlendingDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
     if (m_pDlg)  // Sicherstellen, dass der Zeiger gültig ist
     {
         // Die blending-Funktion im Hauptdialogfenster aufrufen und das Bild mit dem neuen Wert aktualisieren
-        // Der Slider-Wert wird direkt übergeben, ohne kumulative Berechnung
         m_pDlg->m_dib.blending(m_pDlg->m_dib, m_pDlg->m_dibTemp, m_blendValue);
-        m_pDlg->Invalidate();  // Bild neu zeichnen
+        m_pDlg->RedrawWindow();  // Bild neu zeichnen
     }
 
     CDialog::OnHScroll(nSBCode, nPos, pScrollBar);  // Standardbehandlung des Ereignisses

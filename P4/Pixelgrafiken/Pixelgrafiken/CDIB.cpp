@@ -120,10 +120,10 @@ void CDIB::DrawRect(CDC* pDC, CRect rect)
 			0,                   // Source y
 			DibWidth(),          // Source width
 			DibHeight(),         // Source height
-			m_pBits,            // Pointer to bits
-			m_pBMI,             // BITMAPINFO
-			DIB_RGB_COLORS,     // Options
-			SRCCOPY);           // Raster operation code (ROP)
+			m_pBits,             // Pointer to bits
+			m_pBMI,              // BITMAPINFO
+			DIB_RGB_COLORS,      // Options
+			SRCCOPY);            // Raster operation code (ROP)
 	}
 }
 
@@ -131,7 +131,7 @@ void CDIB::DrawRect(CDC* pDC, CRect rect)
 void* CDIB::GetPixelAddress(int x, int y) {
 	int iWidth;
 	if ((x >= DibWidth()) || (y >= DibHeight())) {
-		return NULL;				// pixel is out of range 
+		return NULL;			// pixel is out of range 
 	}
 	iWidth = StorageWidth();	// Bytes pro Bildzeile 
 	if (m_pBMI->bmiHeader.biBitCount == 24)
@@ -270,8 +270,8 @@ void CDIB::contrast(float alpha) {
 
 
 void CDIB::blending(CDIB& b1, CDIB& b2, int p) { 
-	if ((m_pBMFH == 0) || (b1.m_pBMFH == 0) || (b2.m_pBMFH == 0)) 
-		return; 
+	if ((m_pBMFH == 0) || (b1.m_pBMFH == 0) || (b2.m_pBMFH == 0))
+		return;
 
 	if ((m_pBMI->bmiHeader.biBitCount != 24) || (b1.m_pBMI->bmiHeader.biBitCount != 24) || (b2.m_pBMI->bmiHeader.biBitCount != 24)) 
 		return; 
@@ -279,7 +279,7 @@ void CDIB::blending(CDIB& b1, CDIB& b2, int p) {
 	if ((DibWidth() != b1.DibWidth()) || (DibWidth() != b2.DibWidth()) || (DibHeight() != b1.DibHeight()) || (DibHeight() != b2.DibHeight())) 
 		return; 
 	
-	BYTE* t, * t1, * t2; int width = DibWidth() * 3; 
+	BYTE *t, *t1, *t2; int width = DibWidth() * 3; 
 	for (int i = 0; i < DibHeight(); i++) { 
 		t = (BYTE*)GetPixelAddress(0, i); 
 		t1 = (BYTE*)b1.GetPixelAddress(0, i); 
