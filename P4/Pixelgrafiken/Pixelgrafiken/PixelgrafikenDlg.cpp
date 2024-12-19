@@ -315,13 +315,13 @@ void CPixelgrafikenDlg::OnBnClickedBlending()
 			return;
 		}
 
-		// Blending-Dialog anzeigen
-		CBlendingDlg dlgBlend(this);
+		// Blending-Dialog anzeigen und den Zeiger auf das Hauptdialogfenster übergeben
+		CBlendingDlg dlgBlend(this, this);
 		if (dlgBlend.DoModal() == IDOK)
 		{
-			CDIB tempDib = m_dib;  // Original sichern
-			m_dib.blending(tempDib, m_dibTemp, dlgBlend.GetBlendValue());
-			Invalidate();
+			// Blending auf das Bild anwenden und das Bild neu zeichnen
+			m_dib.blending(m_dib, m_dibTemp, dlgBlend.GetBlendValue());
+			Invalidate();  // Bild neu zeichnen
 		}
 	}
 }

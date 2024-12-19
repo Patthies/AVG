@@ -4,6 +4,7 @@
 
 #pragma once
 #include "CDIB.h"
+#include "CBlendingDlg.h" // Header für den Blending-Dialog
 
 // CPixelgrafikenDlg-Dialogfeld
 class CPixelgrafikenDlg : public CDialogEx
@@ -24,9 +25,7 @@ public:
 // Implementierung
 protected:
 	HICON m_hIcon;
-	CDIB m_dib;
 	float m_fScale;  // Skalierungsfaktor
-	CDIB m_dibTemp;  // Temporäres Bild für Blending
 
 	// Generierte Funktionen für die Meldungstabellen
 	virtual BOOL OnInitDialog();
@@ -61,4 +60,6 @@ public:
 	afx_msg void OnBnClickedLoadjpg();
 	afx_msg void OnBnClickedSavejpg();
 	afx_msg void OnNMCustomdrawSliderjpg(NMHDR* pNMHDR, LRESULT* pResult);
+	CDIB m_dib;
+	CDIB m_dibTemp;  // Temporäres Bild für Blending
 };
