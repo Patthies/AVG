@@ -52,7 +52,7 @@ void CBlendingDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
     if (m_pDlg)  // Sicherstellen, dass der Zeiger gültig ist
     {
         // Die blending-Funktion im Hauptdialogfenster aufrufen und das Bild mit dem neuen Wert aktualisieren
-        m_pDlg->m_dib.blending(m_pDlg->m_dib, m_pDlg->m_dibTemp, m_blendValue);
+        m_pDlg->m_dib.blending(m_pDlg->m_dibSave, m_pDlg->m_dibTemp, m_blendValue);
         m_pDlg->RedrawWindow();  // Bild neu zeichnen
     }
 

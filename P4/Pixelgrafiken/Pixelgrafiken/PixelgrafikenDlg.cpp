@@ -290,6 +290,9 @@ void CPixelgrafikenDlg::OnBnClickedBlending()
 		OFN_HIDEREADONLY | OFN_FILEMUSTEXIST,
 		L"Image Files (*.bmp;*.jpg;*.jpeg)|*.bmp;*.jpg;*.jpeg|All Files (*.*)|*.*||");
 
+	m_dibSave.Load(L"bild.bmp");
+	m_dibSave.flip('v');
+
 	if (dlg.DoModal() == IDOK)
 	{
 		CString ext = dlg.GetFileExt().MakeLower();
@@ -308,8 +311,8 @@ void CPixelgrafikenDlg::OnBnClickedBlending()
 		}
 
 		// Prüfen ob die Bilder die gleiche Größe haben
-		if (m_dib.DibWidth() != m_dibTemp.DibWidth() ||
-			m_dib.DibHeight() != m_dibTemp.DibHeight())
+		if (m_dibSave.DibWidth() != m_dibTemp.DibWidth() ||
+			m_dibSave.DibHeight() != m_dibTemp.DibHeight())
 		{
 			AfxMessageBox(L"Die Bilder müssen die gleiche Größe haben!");
 			return;
@@ -320,7 +323,7 @@ void CPixelgrafikenDlg::OnBnClickedBlending()
 		if (dlgBlend.DoModal() == IDOK)
 		{
 			// Blending auf das Bild anwenden und das Bild neu zeichnen
-			m_dib.blending(m_dib, m_dibTemp, dlgBlend.GetBlendValue());
+			m_dib.blending(m_dibSave, m_dibTemp, dlgBlend.GetBlendValue());
 			Invalidate();  // Bild neu zeichnen
 		}
 	}

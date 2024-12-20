@@ -62,4 +62,5 @@ public:
 	afx_msg void OnNMCustomdrawSliderjpg(NMHDR* pNMHDR, LRESULT* pResult);
 	CDIB m_dib;
 	CDIB m_dibTemp;  // Temporäres Bild für Blending
+	CDIB m_dibSave;
 };
